@@ -1,182 +1,163 @@
 # Tanya
 
-"Victory. Such a tempting thing. Naturally, everyone wants to savor a taste." - Tanya von Degurechaff
+"Победа. Такая соблазнительная вещь. Естественно, каждый хочет почувствовать вкус." - Таня фон Дегуршаф
 
-# Installation
+# Установка
 
-This guide is written for *Ubuntu*. For other Linux flavors, adapt commands where needed.
+Это руководство написано для *Ubuntu*. Для других версий Linux адаптируйте команды, где это необходимо.
 
-## (1) Allow Root Login
+## (1) Разрешить вход в систему Root
 
-We'll ensure that the `root` user can login.
+Мы убедимся, что пользователь `root` может войти в систему.
 
-1. Configure your `root` user password:
+1. Настройте пароль пользователя `root`:
 
 ```
 sudo passwd
 ```
 
-See [this page for more information](https://www.cyberciti.biz/faq/how-can-i-log-in-as-root/) on the root user.
+Смотрите [эту страницу для получения дополнительной информации](https://www.cyberciti.biz/faq/how-can-i-log-in-as-root/) о пользователе root.
 
-## (2) Enable Process Isolation
+## (2) Отключить трассировку процессов
 
-We'll ensure that non-root users are unable to see the `project-tanya` service.
+Мы позаботимся о том, чтобы пользователи без права рута не могли использовать возможности `ptrace`.
 
-1. Switch to the `root` user:
-
-```
-su
-```
-
-2. Install dependencies:
-
-```
-apt install -y vim
-```
-
-3. Open `/etc/fstab` with *vim*:
-
-```
-vim /etc/fstab
-```
-
-4. Add the following line:
-
-```
-proc /proc proc defaults,nosuid,nodev,noexec,relatime,hidepid=1 0 0
-```
-
-5. Reboot your system:
-
-```
-reboot
-```
-
-6. Check that your non-root user cannot see root processes:
-
-```
-ps aux
-```
-
-See [this page for more information](https://www.kernel.org/doc/Documentation/filesystems/proc.txt) on process isolation.
-
-## (3) Disable Process Tracing
-
-We'll ensure that non-root users cannot use `ptrace` capabilities.
-
-1. Switch to the `root` user:
+1. Переключитесь на пользователя `root`:
 
 ```
 su
 ```
 
-2. Open `/etc/sysctl.d/10-ptrace.conf` with *vim*:
+2. Откройте `/etc/sysctl.d/10-ptrace.conf` с помощью *vim* или другим редактором текста:
 
 ```
 vim /etc/sysctl.d/10-ptrace.conf
 ```
 
-3. Change the `kernel.yama.ptrace_scope` value to `2`:
+3. Измените значение `kernel.yama.ptrace_scope` на `2`.:
 
 ```
 kernel.yama.ptrace_scope = 2
 ```
 
-4. Reboot your system:
+4. Перезагрузите систему:
 
 ```
 reboot
 ```
 
-5. Check that the `ptrace_scope` is set to `2`:
+5. Проверьте, что `ptrace_scope` установлен на `2`:
 
 ```
 sysctl kernel.yama.ptrace_scope
 ```
 
-See [this page for more information](https://www.kernel.org/doc/Documentation/security/Yama.txt) on process tracing.
+Смотрите [эту страницу для получения дополнительной информации](https://www.kernel.org/doc/Documentation/security/Yama.txt) о трассировке процессов.
 
-## (4) Install .NET
+## (3) Установка .NET
 
-We'll ensure that `project-tanya` can be compiled with *.NET*.
+Мы убедимся, что `Tanya` может быть скомпилирован с *.NET*.
 
-1. Switch to the `root` user:
+1. Переключитесь на пользователя `root`:
 
 ```
 su
 ```
 
-2. Add the *Microsoft* package repositories:
+2. Добавьте репозитории пакетов *Microsoft* (в накоторых linux включены изначально):
 
-* See https://docs.microsoft.com/en-us/dotnet/core/install/linux.
-* Be sure to carefully follow instructions for your Linux flavor.
+* Подробнее https://docs.microsoft.com/en-us/dotnet/core/install/linux.
+* Обязательно тщательно следуйте инструкциям для вашей версии Linux.
+* Пример скриптовой установки, выполнять по порядку:
 
-3. Install *.NET 6.0*:
+* Открытть терминал в нужной папке.
+```
+wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh
+sudo chmod +x ./dotnet-install.sh
+./dotnet-install.sh --version latest
+```
+
+3. Установка *.NET 6.0*:
 
 ```
 apt update && apt install -y dotnet-sdk-6.0
 ```
 
-## (5) Build Service
+## (4) Собираем Сервис
 
-We'll build `project-tanya`, so we can register it as a service:
+Построим `Tanya`, чтобы мы могли зарегистрировать его как сервис:
 
-1. Switch to `root` user:
+1. Переключитесь на пользователя `root`:
 
 ```
 su
 ```
 
-2. Open the `/root` directory: 
+2. Откройте директорию `/root`:
 
 ```
 cd ~
 ```
 
-3. Install dependencies:
+3. Установите зависимые компоненты:
 
 ```
 apt install -y git
 ```
 
-4. Clone this repository:
+4. Клонируйте этот репозиторий:
 
 ```
-git clone https://github.com/XRadius/project-tanya
+git clone https://github.com/ascent-sys/Tanya
 ```
 
-5. Open the `project-tanya` directory:
+5. Откройте директорию `Tanya`:
 
 ```
-cd ~/project-tanya
+cd ~/Tanya
 ```
 
-6. Enable execution of the *build script*:
+6. Разрешить выполнение *сценария сборки*:
 
 ```
 chmod +x service-build.sh
 ```
 
-8. Run the *build script*:
+8. Запустите сценарий *сборки*:
 
 ```
 ./service-build.sh
 ```
 
-## (6) Install Service
+## (5) Установите серсвис
 
-We'll install `project-tanya` as a service:
+Мы установим `Tanya` как сервис:
 
-1. Open the `bin` directory:
-
-```
-cd ~/project-tanya/bin
-```
-
-2. Run the *installation script* and follow the instructions:
+1. Откройте директорию `bin`:
 
 ```
-./service-install.sh
+cd ~/Tanya/bin
 ```
 
-Once you've followed these instructions, `project-tanya` is ready for use!
+2. Запустите скрипт *установки*:
+
+```
+./si.sh
+```
+
+* Введите уникальное название для сервиса, например Discord и т.п.
+* Как только вы выполните эти инструкции, `Tanya` будет готова к использованию!
+* Чтобы отключить сервис запустите скрипт отключения:
+
+```
+./su.sh
+```
+
+* В поле ввидте название сервиса которое ввели при установке сервиса.
+
+## (7) Рекомендации
+
+* Перееименуйте скомпилированный файл 'Tanya' на какой-нибудь другой.
+* Откройте редактором текста файл 'si.sh' измените в нём 'Tanya' на то название файла, которое задали.
+* Скопируйте папку bin или файлы из неё в другую папку без упоминания слова 'Tanya'.
+* Используйте эту папку для установки сервиса.
