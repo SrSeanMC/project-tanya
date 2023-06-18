@@ -1,5 +1,5 @@
 #!/bin/bash
-serviceName="project-tanya"
+serviceName="Tanya"
 
 # ====================
 # 
